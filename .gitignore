@@ -1,0 +1,7 @@
+tmp/*
+tmp
+qrc_*
+tags
+mine
+mine.bak
+Makefile
