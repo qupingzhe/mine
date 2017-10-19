@@ -5,34 +5,38 @@
 
 #include "mine.h"
 
-class QMine : public QObject
-{
+class QMine : public QObject {
 	Q_OBJECT
 public:
-	static Mine* lowMine;
-	static Mine* midMine;
-	static Mine* highMine;
+	static MineInterface* lowMine;
+	static MineInterface* midMine;
+	static MineInterface* highMine;
 
-	QMine( void );
-	~QMine( void );
-	void setLevel( int level );
-	int getCellType( int x, int y );
-	int getColumn( void );
-	int getRow( void );
+	QMine();
+	~QMine();
+	void setLevel(int level);
+  //int getCellType(int x, int y );
+  //int getColumn();
+  //int getRow();
 signals:
-	void start( void );
-	void win( void );
-	void lose( void );
-	void tab( void );
-	void remainingMine( int number );
-	void clicked( QMine* );
-	void clicked( void );
+	//void start();
+	void win();
+	void lose();
+	//void tab();
+	void remainingMine(int number);
+	void clicked();
+  void updateGraph(int** const graph, const int column, const int row);
 public slots:
-	void explore( int x, int y );
-	void mark( int x, int y );
-	void restart( void );
+	void explore(int x, int y);
+	void mark(int x, int y);
+	void restart();
+protected:
+  void testFlag();
 private:
-	Mine* mine;
+	MineInterface* mine_interface_;
+  int** graph_;
+  int row_;
+  int column_;
 };
 
 #endif

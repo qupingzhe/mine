@@ -3,6 +3,7 @@
 #include "mine_field.h"
 #include "qmine.h"
 #include "mine_timer.h"
+#include "status_dialog.h"
 
 #include <QLCDNumber>
 #include <QLabel>
@@ -13,10 +14,9 @@
 #include <QMenu>
 #include <QMenuBar>
 
-#include <iostream>
+//#include <iostream>
 
-MineMainWindow::MineMainWindow( void )
-{
+MineMainWindow::MineMainWindow() {
 	createObject();
 	setMainWidget();
 	createMenuBar();
@@ -24,8 +24,7 @@ MineMainWindow::MineMainWindow( void )
 	restart();
 }
 
-MineMainWindow::~MineMainWindow( void )
-{
+MineMainWindow::~MineMainWindow() {
 	delete qmine;
 	delete mineTimer;
 
@@ -46,8 +45,7 @@ MineMainWindow::~MineMainWindow( void )
 	delete quitAction;
 }
 
-void MineMainWindow::createObject( void )
-{
+void MineMainWindow::createObject() {
 	qmine = new QMine;
 	mineTimer = new MineTimer;
 	timeLCD = new QLCDNumber;
@@ -55,33 +53,40 @@ void MineMainWindow::createObject( void )
 	label->setPixmap( QPixmap(":/images/mark.png") );
 	label->setScaledContents( true );
 	remainingMineLCD = new QLCDNumber;
-	mineField = new MineField( qmine,this );
+	mineField = new MineField(this);
+
+  winDialog = new StatusDialog(QString("Win"));
+  winDialog->hide();
+  loseDialog = new StatusDialog(QString("Lose"));
+  loseDialog->hide();
 }
 
-void MineMainWindow::connectMine( void )
-{
-	connect( qmine, SIGNAL(clicked(QMine*)),
-			mineTimer, SLOT(start()) );
+void MineMainWindow::connectMine() {
+	connect(qmine, SIGNAL(clicked()),
+			mineTimer, SLOT(start()));
 
-	connect( qmine, SIGNAL(clicked(QMine*)),
-			mineField, SLOT(updateGraph(QMine*)) );
-	connect( qmine, SIGNAL(win()),
-			this, SLOT(doWin()) );
-	connect( qmine, SIGNAL(lose()),
-			this, SLOT(doLose()) );
-	connect( mineTimer, SIGNAL(changeTime(int)),
-			timeLCD, SLOT(display(int)) );
-	connect( qmine, SIGNAL(remainingMine(int)),
-		   remainingMineLCD, SLOT(display(int)) );	
+	connect(qmine,
+          SIGNAL(updateGraph(int** const, const int, const int)),
+			    mineField,
+          SLOT(updateGraph(int** const, const int, const int)));
 
-	connect( mineField, SIGNAL(explore(int,int)),
-			qmine, SLOT(explore(int,int)) );
-	connect( mineField, SIGNAL(mark(int,int)),
+	connect(qmine, SIGNAL(win()),
+			this, SLOT(doWin()));
+	connect(qmine, SIGNAL(lose()),
+			this, SLOT(doLose()));
+
+	connect(mineTimer, SIGNAL(changeTime(int)),
+			timeLCD, SLOT(display(int)));
+	connect(qmine, SIGNAL(remainingMine(int)),
+		   remainingMineLCD, SLOT(display(int)));	
+
+	connect(mineField, SIGNAL(explore(int,int)),
+			qmine, SLOT(explore(int,int)));
+	connect(mineField, SIGNAL(mark(int,int)),
 			qmine, SLOT(mark(int,int)) );
 }
 
-void MineMainWindow::setMainWidget( void )
-{
+void MineMainWindow::setMainWidget() {
 	statusLayout = new QHBoxLayout;
 	statusLayout->addWidget( timeLCD,1 );
 	statusLayout->addStretch();
@@ -100,8 +105,7 @@ void MineMainWindow::setMainWidget( void )
 	setCentralWidget( mainWidget );
 }
 
-void MineMainWindow::createMenuBar( void )
-{
+void MineMainWindow::createMenuBar() {
 	restartAction = new QAction( tr("Restart"), this );
 	connect( restartAction, SIGNAL(triggered()),
 			this, SLOT(restart()) );
@@ -138,40 +142,35 @@ void MineMainWindow::createMenuBar( void )
 	menu->addAction( quitAction );
 }
 
-void MineMainWindow::restart( void )
-{
+void MineMainWindow::restart() {
 	mineTimer->restart();
+	mineField->restart();
 	qmine->restart();
-	mineField->restart( qmine );
 }
 
-void MineMainWindow::doWin( void )
-{
+void MineMainWindow::doWin() {
 	mineTimer->stop();
-	std::cout << "Win!!!" << std::endl;
-
+  winDialog->show();
+	//std::cout << "Win!!!" << std::endl;
 }
 
-void MineMainWindow::doLose( void )
-{
+void MineMainWindow::doLose() {
 	mineTimer->stop();
-	std::cout << "Lose!!!" << std::endl;
+  loseDialog->show();
+	//std::cout << "Lose!!!" << std::endl;
 }
 
-void MineMainWindow::low( void )
-{
-	qmine->setLevel( LOW );
+void MineMainWindow::low() {
+	qmine->setLevel(LOW);
 	restart();
 }
 
-void MineMainWindow::mid( void )
-{
+void MineMainWindow::mid() {
 	qmine->setLevel( MID );
 	restart();
 }
 
-void MineMainWindow::high( void )
-{
+void MineMainWindow::high() {
 	qmine->setLevel( HIGH );
 	restart();
 }

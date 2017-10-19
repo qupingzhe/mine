@@ -5,6 +5,7 @@
 class MineField;
 class QMine;
 class MineTimer;
+class StatusDialog;
 
 class QLCDNumber;
 class QLabel;
@@ -13,24 +14,23 @@ class QVBoxLayout;
 class QAction;
 class QMenu;
 
-class MineMainWindow : public QMainWindow
-{
+class MineMainWindow : public QMainWindow {
 	Q_OBJECT
 public:
-	MineMainWindow( void );
-	~MineMainWindow( void );
-	void changeLevel( int level );
-	void createMenuBar( void );
-	void setMainWidget( void );
-	void connectMine( void );
-	void createObject( void );
+	MineMainWindow();
+	~MineMainWindow();
+	void changeLevel(int level);
+	void createMenuBar();
+	void setMainWidget();
+	void connectMine();
+	void createObject();
 private slots:
-	void restart( void );
-	void low( void );
-	void mid( void );
-	void high( void );
-	void doWin( void );
-	void doLose( void );
+	void restart();
+	void low();
+	void mid();
+	void high();
+	void doWin();
+	void doLose();
 private:
 	QMine* qmine;
 
@@ -43,6 +43,8 @@ private:
 	QVBoxLayout* mainLayout;
 
 	MineTimer* mineTimer;
+  StatusDialog* winDialog;
+  StatusDialog* loseDialog;
 
 	QAction* restartAction;
 	QAction* lowAction;
